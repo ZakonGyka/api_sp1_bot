@@ -20,4 +20,6 @@ static/
 posts/static/
 media/
 
+1_try.py
+
 db.sqlite3
