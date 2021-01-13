@@ -20,12 +20,13 @@ PRAKTIKUM_TOKEN = os.getenv("PRAKTIKUM_TOKEN")
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
-bot_client = Bot(token=TELEGRAM_TOKEN)
+# bot_client = Bot(token=TELEGRAM_TOKEN)
 
 
 def parse_homework_status(homework):
     print('++')
-    # homework_name = homework['homework_name']# homework.get('homeworks')[0]['homework_name']
+    homework_name = homework['homework_name']# homework.get('homeworks')[0]['homework_name']
+    print(homework_name)
     # homework_name = homework# homework.get('homeworks')[0]['homework_name']
     print(homework['status'])
     if homework['status'] == 'rejected':
@@ -35,15 +36,15 @@ def parse_homework_status(homework):
                   'можно приступать к следующему уроку.'
     else:
         verdict = 'Работа взята в ревью'
-    return f'У вас проверили работу "{homework}"!\n\n{verdict}'
+    return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
 
 
 def get_homework_statuses(current_timestamp):
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
         # 'Authorization': f'OAuth {PRAKTIKUM_TOKEN}',
-        'from_date': 0, # Убери чтобы запустить с данного момента времени!"""
-        # 'from_date': current_timestamp,
+        # 'from_date': 0, # Убери чтобы запустить с данного момента времени!"""
+        'from_date': current_timestamp,
     }
     try:
         homework_statuses = requests.get('https://praktikum.yandex.ru/api/user_api/homework_statuses/', params=params, headers=headers)
@@ -58,16 +59,12 @@ def get_homework_statuses(current_timestamp):
     return homework_statuses.json()
 
 
-# def send_message(message, bot_client):
-#     print('+++++')
-#     print(CHAT_ID)
-#     print(message)
-#     return bot_client.send_message(chat_id=CHAT_ID, text=message)
-def send_message(message):
+def send_message(message, bot_client):
     print('+++++')
     print(CHAT_ID)
     print(message)
     return bot_client.send_message(chat_id=CHAT_ID, text=message)
+
 
 def main():
     # проинициализировать бота здесь
@@ -80,7 +77,7 @@ def main():
             print(new_homework.get('homeworks')[0])
             if new_homework.get('homeworks'):
                 print('1')
-                send_message(parse_homework_status(new_homework.get('homeworks')[0]))
+                send_message(parse_homework_status(new_homework.get('homeworks')[0]), bot_client=Bot(token=TELEGRAM_TOKEN))
             current_timestamp = new_homework.get('current_date', current_timestamp)  # обновить timestamp
             time.sleep(300)  # опрашивать раз в пять минут
 
