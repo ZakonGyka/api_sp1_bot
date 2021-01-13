@@ -5,6 +5,7 @@ import logging
 import requests
 import telegram
 from dotenv import load_dotenv
+from telegram import Bot
 
 load_dotenv()
 
@@ -19,19 +20,25 @@ PRAKTIKUM_TOKEN = os.getenv("PRAKTIKUM_TOKEN")
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
 CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
+bot_client = Bot(token=TELEGRAM_TOKEN)
+
 
 def parse_homework_status(homework):
-    homework_name = homework['homework_name']# homework.get('homeworks')[0]['homework_name']
+    print('++')
+    # homework_name = homework['homework_name']# homework.get('homeworks')[0]['homework_name']
+    # homework_name = homework# homework.get('homeworks')[0]['homework_name']
+    print(homework['status'])
     if homework['status'] == 'rejected':
         verdict = 'К сожалению в работе нашлись ошибки.'
-    else:
+    elif homework['status'] == 'approved':
         verdict = 'Ревьюеру всё понравилось, ' \
                   'можно приступать к следующему уроку.'
-    return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
+    else:
+        verdict = 'Работа взята в ревью'
+    return f'У вас проверили работу "{homework}"!\n\n{verdict}'
 
 
 def get_homework_statuses(current_timestamp):
-    print('++')
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
         # 'Authorization': f'OAuth {PRAKTIKUM_TOKEN}',
@@ -40,7 +47,6 @@ def get_homework_statuses(current_timestamp):
     }
     try:
         homework_statuses = requests.get('https://praktikum.yandex.ru/api/user_api/homework_statuses/', params=params, headers=headers)
-        print('+--+')
         print(homework_statuses)
         # data = json.loads(homework_statuses.text)
         # print('***')
@@ -52,9 +58,16 @@ def get_homework_statuses(current_timestamp):
     return homework_statuses.json()
 
 
-def send_message(message, bot_client):
+# def send_message(message, bot_client):
+#     print('+++++')
+#     print(CHAT_ID)
+#     print(message)
+#     return bot_client.send_message(chat_id=CHAT_ID, text=message)
+def send_message(message):
+    print('+++++')
+    print(CHAT_ID)
+    print(message)
     return bot_client.send_message(chat_id=CHAT_ID, text=message)
-
 
 def main():
     # проинициализировать бота здесь
@@ -62,7 +75,6 @@ def main():
 
     while True:
         try:
-            print('+')
             new_homework = get_homework_statuses(current_timestamp)
             print('*-*-*--*')
             print(new_homework.get('homeworks')[0])
