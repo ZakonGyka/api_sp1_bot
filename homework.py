@@ -31,23 +31,28 @@ def parse_homework_status(homework):
 
 
 def get_homework_statuses(current_timestamp):
+    print('++')
+    headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
-        'Authorization: OAuth <token>': 'PRAKTIKUM_TOKEN',
-        'from_date': current_timestamp,
+        # 'Authorization': f'OAuth {PRAKTIKUM_TOKEN}',
+        'from_date': 0, # Убери чтобы запустить с данного момента времени!"""
+        # 'from_date': current_timestamp,
     }
     try:
-        homework_statuses = requests.post(' https://praktikum.yandex.ru/api/user_api/homework_statuses/', params=params)
+        homework_statuses = requests.get('https://praktikum.yandex.ru/api/user_api/homework_statuses/', params=params, headers=headers)
+        print('+--+')
+        print(homework_statuses)
         # data = json.loads(homework_statuses.text)
+        # print('***')
+        # print(data)
     except BaseException as e:
         logging.exception('Ошибка получения статуса')
         raise Exception('Ошибка с запросом')
-    # homework_statuses = requests.post(' https://praktikum.yandex.ru/api/user_api/homework_statuses/', params=params)
     # logging.exception('Ошибка получения статуса')
     return homework_statuses.json()
 
 
 def send_message(message, bot_client):
-    ...
     return bot_client.send_message(chat_id=CHAT_ID, text=message)
 
 
@@ -57,8 +62,12 @@ def main():
 
     while True:
         try:
+            print('+')
             new_homework = get_homework_statuses(current_timestamp)
+            print('*-*-*--*')
+            print(new_homework.get('homeworks')[0])
             if new_homework.get('homeworks'):
+                print('1')
                 send_message(parse_homework_status(new_homework.get('homeworks')[0]))
             current_timestamp = new_homework.get('current_date', current_timestamp)  # обновить timestamp
             time.sleep(300)  # опрашивать раз в пять минут
