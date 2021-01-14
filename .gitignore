@@ -21,5 +21,6 @@ posts/static/
 media/
 
 1_try.py
+main.log
 
 db.sqlite3

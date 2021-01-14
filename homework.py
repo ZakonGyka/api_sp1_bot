@@ -14,7 +14,6 @@ logging.basicConfig(
             level=logging.INFO,
             filename='main.log',
             format='%(asctime)s; %(levelname)s; %(name)s; %(message)s',
-            # filemode="w",
             )
 
 PRAKTIKUM_TOKEN = os.getenv("PRAKTIKUM_TOKEN")
@@ -23,22 +22,38 @@ CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
 def parse_homework_status(homework):
-    homework_name = homework['homework_name']
 
-    if homework['status'] == 'rejected':
-        verdict = 'К сожалению в работе нашлись ошибки.'
-    elif homework['status'] == 'approved':
-        verdict = (f'Ревьюеру всё понравилось, '
-                   f'можно приступать к следующему уроку.')
+    print('++')
+    # print(homework_name)
+    print('---')
+    print(homework.keys())
+    print(len(homework))
+    if (len(homework) > 0
+            and 'status' in homework.keys()
+            and 'homework_name' in homework.keys()):
+        if homework['status'] == 'rejected':
+            verdict = 'К сожалению в работе нашлись ошибки.'
+        elif homework['status'] == 'approved':
+            verdict = (f'Ревьюеру всё понравилось, '
+                       f'можно приступать к следующему уроку.')
+        else:
+            verdict = 'Работа взята в ревью'
+        homework_name = homework['homework_name']
+        return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
+    elif ('error' in homework.keys()
+          and 'error_msg' in homework['error'].keys()):
+        logging.exception(homework['error']['error_msg'])
+        raise Exception(homework['error']['error_msg'])
     else:
-        verdict = 'Работа взята в ревью'
-    return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
+        logging.exception('Fatal error')
+        raise Exception('Fatal error')
+
 
 
 def get_homework_statuses(current_timestamp):
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
-        # 'from_date': 0, # Убери чтобы запустить с данного момента времени!
+        #'from_date': 0, # Убери чтобы запустить с данного момента времени!
         'from_date': current_timestamp,
     }
     try:
@@ -46,6 +61,8 @@ def get_homework_statuses(current_timestamp):
             'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
             params=params, headers=headers
         )
+        print('+')
+        print(homework_statuses.json())
     except BaseException as e:
         logging.exception('Ошибка получения статуса')
         raise Exception('Ошибка с запросом')
@@ -59,7 +76,7 @@ def send_message(message, bot_client):
 def main():
     # проинициализировать бота здесь
     current_timestamp = int(time.time())  # начальное значение timestamp
-
+    print(current_timestamp)
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
