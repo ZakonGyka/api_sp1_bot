@@ -23,11 +23,6 @@ CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 def parse_homework_status(homework):
 
-    print('++')
-    # print(homework_name)
-    print('---')
-    print(homework.keys())
-    print(len(homework))
     if (len(homework) > 0
             and 'status' in homework.keys()
             and 'homework_name' in homework.keys()):
@@ -49,11 +44,11 @@ def parse_homework_status(homework):
         raise Exception('Fatal error')
 
 
-
 def get_homework_statuses(current_timestamp):
+    if current_timestamp is None:
+        current_timestamp = int(time.time())
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
-        #'from_date': 0, # Убери чтобы запустить с данного момента времени!
         'from_date': current_timestamp,
     }
     try:
@@ -61,8 +56,6 @@ def get_homework_statuses(current_timestamp):
             'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
             params=params, headers=headers
         )
-        print('+')
-        print(homework_statuses.json())
     except BaseException as e:
         logging.exception('Ошибка получения статуса')
         raise Exception('Ошибка с запросом')
@@ -76,7 +69,7 @@ def send_message(message, bot_client):
 def main():
     # проинициализировать бота здесь
     current_timestamp = int(time.time())  # начальное значение timestamp
-    print(current_timestamp)
+
     while True:
         try:
             new_homework = get_homework_statuses(current_timestamp)
