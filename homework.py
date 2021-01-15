@@ -14,6 +14,7 @@ logging.basicConfig(
             level=logging.INFO,
             filename='main.log',
             format='%(asctime)s; %(levelname)s; %(name)s; %(message)s',
+            filemode='w',
             )
 
 PRAKTIKUM_TOKEN = os.getenv("PRAKTIKUM_TOKEN")
@@ -35,18 +36,13 @@ def parse_homework_status(homework):
             verdict = 'Работа взята в ревью'
         homework_name = homework['homework_name']
         return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
-    elif ('error' in homework.keys()
-          and 'error_msg' in homework['error'].keys()):
-        logging.exception(homework['error']['error_msg'])
-        raise Exception(homework['error']['error_msg'])
     else:
         logging.exception('Fatal error')
         raise Exception('Fatal error')
 
 
 def get_homework_statuses(current_timestamp):
-    if current_timestamp is None:
-        current_timestamp = int(time.time())
+    if current_timestamp is None: current_timestamp = int(time.time())
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
         'from_date': current_timestamp,
