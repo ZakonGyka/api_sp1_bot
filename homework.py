@@ -23,19 +23,20 @@ CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
 def parse_homework_status(homework):
-
+    homework_name = homework['homework_name']
     if (len(homework) > 0
             and 'status' in homework.keys()
             and 'homework_name' in homework.keys()):
         if homework['status'] == 'rejected':
-            verdict = 'К сожалению в работе нашлись ошибки.'
+            return (f'У вас проверили работу "{homework_name}"!\n\n'
+                    f'К сожалению в работе нашлись ошибки.')
         elif homework['status'] == 'approved':
-            verdict = (f'Ревьюеру всё понравилось, '
-                       f'можно приступать к следующему уроку.')
+            return (f'У вас проверили работу "{homework_name}"!\n\n'
+                    f'Ревьюеру всё понравилось, '
+                    f'можно приступать к следующему уроку.')
         else:
-            verdict = 'Работа взята в ревью'
-        homework_name = homework['homework_name']
-        return f'У вас проверили работу "{homework_name}"!\n\n{verdict}'
+            return (f'У вас проверили работу "{homework_name}"!\n\n'
+                    f'Работа взята в ревью')
     else:
         logging.exception('Fatal error')
         raise Exception('Fatal error')
