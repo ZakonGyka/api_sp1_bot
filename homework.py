@@ -23,27 +23,26 @@ CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
 def parse_homework_status(homework):
-    homework_name = homework['homework_name']
-    if (len(homework) > 0
-            and 'status' in homework.keys()
-            and 'homework_name' in homework.keys()):
-        if homework['status'] == 'rejected':
-            return (f'У вас проверили работу "{homework_name}"!\n\n'
-                    f'К сожалению в работе нашлись ошибки.')
-        elif homework['status'] == 'approved':
-            return (f'У вас проверили работу "{homework_name}"!\n\n'
-                    f'Ревьюеру всё понравилось, '
-                    f'можно приступать к следующему уроку.')
-        else:
-            return (f'У вас проверили работу "{homework_name}"!\n\n'
-                    f'Работа взята в ревью')
+    try:
+        homework_name = homework['homework_name']
+    except:
+        logging.exception('Отсутсвует имя работы')
+        raise Exception('homework_name error')
+    if homework['status'] == 'rejected':
+        return (f'У вас проверили работу "{homework_name}"!\n\n'
+                f'К сожалению в работе нашлись ошибки.')
+    elif homework['status'] == 'approved':
+        return (f'У вас проверили работу "{homework_name}"!\n\n'
+                f'Ревьюеру всё понравилось, '
+                f'можно приступать к следующему уроку.')
     else:
-        logging.exception('Fatal error')
-        raise Exception('Fatal error')
+        return (f'У вас проверили работу "{homework_name}"!\n\n'
+                f'Работа взята в ревью')
 
 
 def get_homework_statuses(current_timestamp):
-    if current_timestamp is None: current_timestamp = int(time.time())
+    current_timestamp = int(time.time()) \
+        if current_timestamp is None else current_timestamp
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
         'from_date': current_timestamp,
