@@ -41,8 +41,7 @@ def parse_homework_status(homework):
 
 
 def get_homework_statuses(current_timestamp):
-    current_timestamp = int(time.time()) \
-        if current_timestamp is None else current_timestamp
+    current_timestamp = current_timestamp or int(time.time())
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
         'from_date': current_timestamp,
