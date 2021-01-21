@@ -44,15 +44,10 @@ def get_homework_statuses(current_timestamp):
     params = {
         'from_date': current_timestamp,
     }
-    try:
-        homework_statuses = requests.get(
-            'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
-            params=params, headers=headers
-        )
-    except BaseException as e:
-        logging.exception('Ошибка получения статуса')
-    print('+')
-    print(homework_statuses.json())
+    homework_statuses = requests.get(
+        'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
+        params=params, headers=headers
+    )
     return homework_statuses.json()
 
 
