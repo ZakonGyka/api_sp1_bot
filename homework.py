@@ -23,21 +23,19 @@ CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
 def parse_homework_status(homework):
-    try:
-        homework_name = homework['homework_name']
-    except:
-        logging.exception('Отсутсвует имя работы')
-        raise Exception('homework_name error')
-    if homework['status'] == 'rejected':
+    homework_name = homework.get('homework_name')
+    status = homework.get('status')
+    if status == 'rejected':
         return (f'У вас проверили работу "{homework_name}"!\n\n'
                 f'К сожалению в работе нашлись ошибки.')
-    elif homework['status'] == 'approved':
+    elif status == 'approved':
         return (f'У вас проверили работу "{homework_name}"!\n\n'
                 f'Ревьюеру всё понравилось, '
                 f'можно приступать к следующему уроку.')
+    elif status == 'reviewing':
+        return f'Работа "{homework_name}" взята на ревью'
     else:
-        return (f'У вас проверили работу "{homework_name}"!\n\n'
-                f'Работа взята в ревью')
+        logging.exception('Получен неизвестный статус')
 
 
 def get_homework_statuses(current_timestamp):
@@ -53,6 +51,8 @@ def get_homework_statuses(current_timestamp):
         )
     except BaseException as e:
         logging.exception('Ошибка получения статуса')
+    print('+')
+    print(homework_statuses.json())
     return homework_statuses.json()
 
 
