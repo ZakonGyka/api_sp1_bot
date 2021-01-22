@@ -46,7 +46,7 @@ def get_homework_statuses(current_timestamp):
     current_timestamp = current_timestamp or int(time.time())
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
-        'from_date': 0,
+        'from_date': current_timestamp,
     }
     try:
         homework_statuses = requests.get(
@@ -54,8 +54,7 @@ def get_homework_statuses(current_timestamp):
             params=params, headers=headers
         )
     except BaseException as e:
-        logging.exception('Ошибка получения статуса\n\n'
-                          f'Код ошибки: {homework_statuses.status_code} ')
+        logging.exception('Ошибка получения статуса')
         return homework_statuses.status_code
     return homework_statuses.json()
 
