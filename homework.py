@@ -11,11 +11,11 @@ from telegram import Bot
 load_dotenv()
 
 logging.basicConfig(
-            level=logging.INFO,
-            filename='main.log',
-            format='%(asctime)s; %(levelname)s; %(name)s; %(message)s',
-            filemode='w',
-            )
+    level=logging.INFO,
+    filename='main.log',
+    format='%(asctime)s; %(levelname)s; %(name)s; %(message)s',
+    filemode='w',
+)
 
 PRAKTIKUM_TOKEN = os.getenv("PRAKTIKUM_TOKEN")
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN')
@@ -23,15 +23,19 @@ CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
 
 
 def parse_homework_status(homework):
-    homework_name = homework.get('homework_name')
-    status = homework.get('status')
+    homework_name = homework.get('homework_name',
+                                 logging.exception('Отсутсвует название '
+                                                   'домашней работы')
+                                 and 'Отсутсвует название домашней работы')
+    status = homework.get('status', logging.exception('Отсутсвует status')
+                          and 'Отсутсвует status')
     if status == 'rejected':
         return (f'У вас проверили работу "{homework_name}"!\n\n'
-                f'К сожалению в работе нашлись ошибки.')
+                'К сожалению в работе нашлись ошибки.')
     elif status == 'approved':
         return (f'У вас проверили работу "{homework_name}"!\n\n'
-                f'Ревьюеру всё понравилось, '
-                f'можно приступать к следующему уроку.')
+                'Ревьюеру всё понравилось, '
+                'можно приступать к следующему уроку.')
     elif status == 'reviewing':
         return f'Работа "{homework_name}" взята на ревью'
     else:
@@ -42,12 +46,17 @@ def get_homework_statuses(current_timestamp):
     current_timestamp = current_timestamp or int(time.time())
     headers = {'Authorization': f'OAuth {PRAKTIKUM_TOKEN}'}
     params = {
-        'from_date': current_timestamp,
+        'from_date': 0,
     }
-    homework_statuses = requests.get(
-        'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
-        params=params, headers=headers
-    )
+    try:
+        homework_statuses = requests.get(
+            'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
+            params=params, headers=headers
+        )
+    except BaseException as e:
+        logging.exception('Ошибка получения статуса\n\n'
+                          f'Код ошибки: {homework_statuses.status_code} ')
+        return homework_statuses.status_code
     return homework_statuses.json()
 
 
