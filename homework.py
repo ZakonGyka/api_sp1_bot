@@ -52,7 +52,7 @@ def get_homework_statuses(current_timestamp):
             'https://praktikum.yandex.ru/api/user_api/homework_statuses/',
             params=params, headers=headers
         )
-    except BaseException as e:
+    except:
         logging.exception('Ошибка получения статуса')
         return {}
     return homework_statuses.json()
