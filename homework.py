@@ -55,7 +55,7 @@ def get_homework_statuses(current_timestamp):
         )
     except BaseException as e:
         logging.exception('Ошибка получения статуса')
-        return homework_statuses.status_code
+        return {}
     return homework_statuses.json()
 
 
