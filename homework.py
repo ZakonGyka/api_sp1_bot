@@ -26,10 +26,8 @@ def parse_homework_status(homework):
     if homework_name is None:
         logging.exception('Отсутсвует название домашней работы')
         homework_name = 'Отсутсвует название домашней работы'
+
     status = homework.get('status')
-    if status is None:
-        logging.exception('Отсутсвует status')
-        status = 'Отсутсвует status'
 
     status_dict = {'rejected': f'У вас проверили работу "{homework_name}"!\n\n'
                                'К сожалению в работе нашлись ошибки.',
@@ -41,7 +39,7 @@ def parse_homework_status(homework):
     if status in status_dict:
         return status_dict[status]
     logging.error('Получен неизвестный статус')
-
+    return 'Получен неизвестный статус'
 
 
 def get_homework_statuses(current_timestamp):
