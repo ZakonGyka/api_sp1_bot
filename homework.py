@@ -31,17 +31,17 @@ def parse_homework_status(homework):
         logging.exception('Отсутсвует status')
         status = 'Отсутсвует status'
 
-    if status == 'rejected':
-        return (f'У вас проверили работу "{homework_name}"!\n\n'
-                'К сожалению в работе нашлись ошибки.')
-    elif status == 'approved':
-        return (f'У вас проверили работу "{homework_name}"!\n\n'
-                'Ревьюеру всё понравилось, '
-                'можно приступать к следующему уроку.')
-    elif status == 'reviewing':
-        return f'Работа "{homework_name}" взята на ревью'
+    status_dict = {'rejected': f'У вас проверили работу "{homework_name}"!\n\n'
+                               'К сожалению в работе нашлись ошибки.',
+                   'approved': f'У вас проверили работу "{homework_name}"!\n\n'
+                               'Ревьюеру всё понравилось, '
+                               'можно приступать к следующему уроку.',
+                   'reviewing': f'Работа "{homework_name}" взята на ревью'}
 
-    logging.error('Получен неизвестный статус')
+    if status not in status_dict:
+        logging.error('Получен неизвестный статус')
+    else:
+        return status_dict[status]
 
 
 def get_homework_statuses(current_timestamp):
