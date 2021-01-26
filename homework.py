@@ -38,10 +38,10 @@ def parse_homework_status(homework):
                                'можно приступать к следующему уроку.',
                    'reviewing': f'Работа "{homework_name}" взята на ревью'}
 
-    if status not in status_dict:
-        logging.error('Получен неизвестный статус')
-    else:
+    if status in status_dict:
         return status_dict[status]
+    logging.error('Получен неизвестный статус')
+
 
 
 def get_homework_statuses(current_timestamp):
